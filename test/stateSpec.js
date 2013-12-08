@@ -122,7 +122,6 @@ describe('state', function () {
 
   function initStateTo(state, optionalParams) {
     var $state = $get('$state'), $q = $get('$q');
-    debugger;
     $state.transitionTo(state, optionalParams || {});
     $q.flush();
     expect($state.current).toBe(state);
@@ -258,7 +257,6 @@ describe('state', function () {
     }));
 
     it('can lazy-define a state in $stateNotFound', inject(function ($state, $q, $rootScope) {
-      debugger;
       initStateTo(DD, { x: 1, y: 2, z: 3 });
       var called;
       $rootScope.$on('$stateNotFound', function (ev, redirect) {

@@ -61,13 +61,6 @@ module.exports = function (karma) {
     // - Opera
     // - Safari
     // - PhantomJS
-    browsers: [ 'Chrome' ],
-
-    customLaunchers: {
-      'PhantomJS_debug': {
-        base: 'PhantomJS',
-        flags: ['--remote-debugger-port=9000', '--remote-debugger-autorun=yes']
-      }
-    }
+    browsers: [ 'PhantomJS' ]
   })
 };
