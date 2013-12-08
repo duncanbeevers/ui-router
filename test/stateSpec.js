@@ -26,6 +26,10 @@ describe('state', function () {
       H = { data: {propA: 'propA', propB: 'propB'} },
       HH = { parent: H },
       HHH = {parent: HH, data: {propA: 'overriddenA', propC: 'propC'} },
+      I = { name: 'I' },
+      II = { name: 'II', parent: I },
+      J = {},
+      JJ = {},
       RS = { url: '^/search?term', reloadOnSearch: false },
       AppInjectable = {};
 
@@ -46,6 +50,10 @@ describe('state', function () {
       .state('H', H)
       .state('HH', HH)
       .state('HHH', HHH)
+      .state(I)
+      .state(II)
+      .state('J', J)
+      .state('J.JJ', JJ)
       .state('RS', RS)
 
       .state('home', { url: "/" })
@@ -152,7 +160,7 @@ describe('state', function () {
       });
       $q.flush();
       expect($location.search()).toEqual({term: 'hello'});
-      expect(called).toBeFalsy();        
+      expect(called).toBeFalsy();
     }));
 
     it('ignores non-applicable state parameters', inject(function ($state, $q) {
@@ -461,6 +469,58 @@ describe('state', function () {
       expect($state.$current.name).toBe('about.sidebar');
     }));
 
+    describe('absolute sref', function ($state, $q) {
+      var $state, $q;
+
+      beforeEach(inject(['$state', '$q', function (_$state_, _$q_) {
+        $state = _$state_;
+        $q = _$q_;
+        $state.go("home"); $q.flush();
+      }]));
+
+      it('transitions to peer', function() {
+        $state.go('A'); $q.flush();
+        expect($state.$current.name).toBe('A');
+      });
+
+      it('transitions to peer-with-child', function() {
+        $state.go('D'); $q.flush();
+        expect($state.$current.name).toBe('D');
+      });
+
+      it('transitions to own child', function() {
+        $state.go('D'); $q.flush();
+        $state.go('D.DD'); $q.flush();
+        expect($state.$current.name).toBe('D.DD');
+      });
+
+      it('transitions to child of peer', function() {
+        $state.go('D.DD'); $q.flush();
+        expect($state.$current.name).toBe('D.DD');
+      });
+
+      it('transitions to peer with `name`', function() {
+        $state.go('I'); $q.flush();
+        expect($state.$current.name).toBe('I');
+      });
+
+      it('transitions to own child with `name`', function() {
+        $state.go('I'); $q.flush();
+        $state.go('I.II'); $q.flush();
+        expect($state.$current.name).toBe('I.II');
+      });
+
+      it('transitions to child of peer with `name`', function() {
+        $state.go('I.II'); $q.flush();
+        expect($state.$current.name).toBe('I.II');
+      });
+
+      it('transitions to peer with dot-name', function() {
+        $state.go('J.JJ'); $q.flush();
+        expect($state.$current.name).toBe('J.JJ');
+      });
+    });
+
     it('keeps parameters from common ancestor states', inject(function ($state, $stateParams, $q) {
       $state.transitionTo('about.person', { person: 'bob' });
       $q.flush();
@@ -621,7 +681,7 @@ describe('state', function () {
       expect($state.href("about.person", { person: "bob" })).toEqual("#/about/bob");
       expect($state.href("about.person.item", { person: "bob", id: null })).toEqual("#/about/bob/");
     }));
-    
+
     it('generates absolute url when absolute is true', inject(function ($state) {
       expect($state.href("about.sidebar", null, { absolute: true })).toEqual("http://server/#/about");
       locationProvider.html5Mode(true);
@@ -650,11 +710,15 @@ describe('state', function () {
         'B',
         'C',
         'D',
-        'DD',
+        'D.DD',
         'E',
         'H',
-        'HH',
-        'HHH',
+        'H.HH',
+        'H.HH.HHH',
+        'I',
+        'I.II',
+        'J',
+        'J.JJ',
         'RS',
         'about',
         'about.person',
