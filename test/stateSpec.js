@@ -911,7 +911,7 @@ describe('state', function () {
       });
       stateProvider.state('AA', { parent: A, data: { baz: "true" } });
 
-      $state.transitionTo('AA');
+      $state.transitionTo('A.AA');
       $q.flush();
       expect($state.current.data).toEqual({ baz: 'true', foo: 'bar' });
     }));
