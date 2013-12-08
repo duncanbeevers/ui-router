@@ -162,8 +162,6 @@ function $StateProvider(   $urlRouterProvider,   $urlMatcherFactory,           $
         parentName,
         lastDot = name.lastIndexOf('.');
 
-    debugger;
-
     // Get parent name
     if (lastDot !== -1) {
       parentName = name.substring(0, lastDot);
