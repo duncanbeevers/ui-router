@@ -223,7 +223,7 @@ describe('state', function () {
         message = err.message;
       }
       $q.flush();
-      expect(message).toEqual('No such state \'never_defined\'');
+      expect(message).toEqual('No such state "never_defined"');
       expect(called).toBeTruthy();
       expect($state.current).toBe(E);
     }));
