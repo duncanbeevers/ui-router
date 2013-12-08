@@ -46,7 +46,7 @@ module.exports = function (karma) {
 
     // level of logging
     // possible values: LOG_DISABLE || LOG_ERROR || LOG_WARN || LOG_INFO || LOG_DEBUG
-    logLevel: karma.LOG_DEBUG,
+    logLevel: karma.LOG_INFO,
 
     // enable / disable watching file and executing tests whenever any file changes
     autoWatch: false,
@@ -61,6 +61,13 @@ module.exports = function (karma) {
     // - Opera
     // - Safari
     // - PhantomJS
-    browsers: [ 'PhantomJS' ]
+    browsers: [ 'Chrome' ],
+
+    customLaunchers: {
+      'PhantomJS_debug': {
+        base: 'PhantomJS',
+        flags: ['--remote-debugger-port=9000', '--remote-debugger-autorun=yes']
+      }
+    }
   })
 };
