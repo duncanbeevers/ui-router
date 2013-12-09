@@ -177,6 +177,7 @@ function $StateProvider(   $urlRouterProvider,   $urlMatcherFactory,           $
     if (parentName) {
       name = parentName + '.' + name;
       state.name = name;
+      state.self.name = name;
     }
 
     if (!isString(name) || name.indexOf('@') >= 0) throw new Error("State must have a valid name");
