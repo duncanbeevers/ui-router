@@ -13,7 +13,7 @@ describe('state', function () {
   }
   function callbackLogger(what) {
     return function () {
-      if (logEnterExit) log += this.name + '.' + what + ';';
+      if (logEnterExit) log += this.name + '!' + what + ';';
     };
   }
 
@@ -263,10 +263,10 @@ describe('state', function () {
         stateProvider.state(redirect.to, { parent: DD, params: [ 'x', 'y', 'z', 'w' ]});
         called = true;
       });
-      var promise = $state.go('DDD', { w: 4 });
+      var promise = $state.go('D.DD.DDD', { w: 4 });
       $q.flush();
       expect(called).toBeTruthy();
-      expect($state.current.name).toEqual('DDD');
+      expect($state.current.name).toEqual('D.DD.DDD');
       expect($state.params).toEqual({ x: '1', y: '2', z: '3', w: '4' });
     }));
 
@@ -406,14 +406,14 @@ describe('state', function () {
       log += $state.current.name + ';';
       $state.transitionTo(A, {}); $q.flush();
       expect(log).toBe(
-        'A.onExit;' +
-        'D.onEnter;' +
+        'A!onExit;' +
+        'D!onEnter;' +
         'D;' +
-        'DD.onEnter;' +
-        'DD;' +
-        'DD.onExit;' +
-        'D.onExit;' +
-        'A.onEnter;');
+        'D.DD!onEnter;' +
+        'D.DD;' +
+        'D.DD!onExit;' +
+        'D!onExit;' +
+        'A!onEnter;');
     }));
 
     it('doesn\'t transition to parent state when child has no URL', inject(function ($state, $q) {
@@ -425,7 +425,7 @@ describe('state', function () {
       $state.transitionTo(DD);
       $q.flush();
 
-      var err = "Could not resolve '^.Z' from state 'DD'";
+      var err = "Could not resolve '^.Z' from state 'D.DD'";
       expect(function() { $state.transitionTo("^.Z", null, { relative: $state.$current }); }).toThrow(err);
     }));
 
@@ -469,7 +469,7 @@ describe('state', function () {
       expect($state.$current.name).toBe('about.sidebar');
     }));
 
-    describe('absolute sref', function ($state, $q) {
+    describe('absolute and object sref', function ($state, $q) {
       var $state, $q;
 
       beforeEach(inject(['$state', '$q', function (_$state_, _$q_) {
@@ -518,6 +518,11 @@ describe('state', function () {
       it('transitions to peer with dot-name', function() {
         $state.go('J.JJ'); $q.flush();
         expect($state.$current.name).toBe('J.JJ');
+      });
+
+      it('transitions to peer by reference', function() {
+        $state.go(DD); $q.flush();
+        expect($state.$current.name).toBe('D.DD');
       });
     });
 
@@ -850,14 +855,14 @@ describe('state', function () {
 
     it('should be inherited from parent if state doesn\'t define it', inject(function ($state) {
       initStateTo(HH);
-      expect($state.current.name).toEqual('HH');
+      expect($state.current.name).toEqual('H.HH');
       expect($state.current.data.propA).toEqual(H.data.propA);
       expect($state.current.data.propB).toEqual(H.data.propB);
     }));
 
     it('should be overridden/extended if state defines it', inject(function ($state) {
       initStateTo(HHH);
-      expect($state.current.name).toEqual('HHH');
+      expect($state.current.name).toEqual('H.HH.HHH');
       expect($state.current.data.propA).toEqual(HHH.data.propA);
       expect($state.current.data.propB).toEqual(H.data.propB);
       expect($state.current.data.propB).toEqual(HH.data.propB);
@@ -887,7 +892,7 @@ describe('state', function () {
 
     it('should include itself and parent states', inject(function ($state, $q) {
       $state.transitionTo(DD); $q.flush();
-      expect($state.$current.includes).toEqual({ '': true, D: true, DD: true });
+      expect($state.$current.includes).toEqual({ '': true, 'D': true, 'D.DD': true });
     }));
   });
 
@@ -970,7 +975,7 @@ describe('state queue', function(){
         .state('queue-test-a.child', {})
     });
 
-  var expectedStates = ['','queue-test-a', 'queue-test-a.child', 'queue-test-b', 'queue-test-b-child'];
+  var expectedStates = ['','queue-test-a', 'queue-test-a.child', 'queue-test-b', 'queue-test-b.queue-test-b-child'];
 
   it('should work across modules', function() {
     module('ui.router.queue.test', 'ui.router.queue.test.dependency');
